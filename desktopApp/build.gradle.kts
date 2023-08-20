@@ -12,6 +12,10 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":shared"))
+                implementation(compose.material3)
+
+                // desktop window styler
+                implementation("com.mayakapps.compose:window-styler:0.3.2")
             }
         }
     }
