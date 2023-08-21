@@ -13,7 +13,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Corbel Editor",
-        state = rememberWindowState(width = 640.dp, height = 480.dp)
+        state = rememberWindowState(width = 1024.dp, height = 768.dp)
     ) {
         WindowStyle(
             isDarkTheme = dark,
