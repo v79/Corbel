@@ -16,6 +16,10 @@ kotlin {
 
                 // desktop window styler
                 implementation("com.mayakapps.compose:window-styler:0.3.2")
+
+                // previews
+                implementation(compose.preview)
+                implementation(compose.uiTooling)
             }
         }
     }

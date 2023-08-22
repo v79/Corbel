@@ -1,0 +1,36 @@
+package org.liamjd.cantilever.corbel
+
+import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Text
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.em
+import org.liamjd.cantilever.corbel.ui.models.Tabs
+
+@Composable
+fun TabBar(colorScheme: ColorScheme, onTabChange: (Int) -> Unit) {
+    var tabIndex by remember { mutableStateOf(0) }
+    Column(Modifier.fillMaxWidth()) {
+        TabRow(selectedTabIndex = tabIndex) {
+            Tabs.entries.forEachIndexed { index, title ->
+                Tab(
+                    selected = tabIndex == index,
+                    onClick = { tabIndex = index; onTabChange(tabIndex) }) {
+                    Text(title.name, color = colorScheme.onSurface, fontSize = 1.em)
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun Greep() {
+    Text(text = "greep", color = Color.Red)
+}
