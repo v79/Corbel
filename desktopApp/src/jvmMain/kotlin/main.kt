@@ -24,7 +24,7 @@ fun main() = application {
             backdropType = WindowBackdrop.Mica,
             frameStyle = WindowFrameStyle()
         )
-        DesktopApp(isDark = dark)
+        DesktopApp(isDark = true)
     }
 }
 

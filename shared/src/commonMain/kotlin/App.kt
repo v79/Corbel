@@ -17,6 +17,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
+@Deprecated("Not using this one")
 fun CommonAndroidApp() {
     MaterialTheme {
         var greetingText by remember { mutableStateOf("Hello, World!") }

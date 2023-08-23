@@ -7,10 +7,15 @@ import androidx.compose.material.Text
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.em
+import org.liamjd.cantilever.corbel.ui.DarkColors
+import org.liamjd.cantilever.corbel.ui.LightColors
 import org.liamjd.cantilever.corbel.ui.models.Tabs
 
 @Composable
@@ -29,8 +34,10 @@ fun TabBar(colorScheme: ColorScheme, onTabChange: (Int) -> Unit) {
     }
 }
 
+
 @Preview
 @Composable
-fun Greep() {
-    Text(text = "greep", color = Color.Red)
+fun TabBarPreview() {
+    val cl = DarkColors
+    TabBar(cl) {}
 }
