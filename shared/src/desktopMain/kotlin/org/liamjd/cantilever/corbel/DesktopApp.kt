@@ -47,6 +47,9 @@ fun DesktopApp(isDark: Boolean = true) {
 
     AppTheme(useDarkTheme = isDark) {
         Surface(Modifier.fillMaxSize(), color = colorScheme.surface) {
+
+
+
             if (showLoginDialog) {
                 LoginDialog()
             } else {
