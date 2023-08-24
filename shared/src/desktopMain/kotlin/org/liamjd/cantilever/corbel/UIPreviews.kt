@@ -27,7 +27,7 @@ fun TestBox() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(Modifier.fillMaxWidth(0.3f)) {
-                    LoginDialog()
+                    LoginDialog(onDismiss = {}, onSubmit = {})
                 }
             }
         }
