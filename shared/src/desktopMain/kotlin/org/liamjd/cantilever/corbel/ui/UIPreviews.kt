@@ -1,4 +1,4 @@
-package org.liamjd.cantilever.corbel
+package org.liamjd.cantilever.corbel.ui
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.border
@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.liamjd.cantilever.corbel.ui.AppTheme
+import org.liamjd.cantilever.corbel.LoginDialog
 
 @Preview
 @Composable
