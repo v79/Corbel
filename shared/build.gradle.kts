@@ -29,6 +29,7 @@ kotlin {
     }
 
     sourceSets {
+        val ktorVersion = extra["ktor.version"] as String
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
@@ -37,6 +38,9 @@ kotlin {
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
 
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
+                implementation("io.ktor:ktor-client-logging:$ktorVersion")
             }
         }
         val androidMain by getting {
@@ -61,9 +65,8 @@ kotlin {
                 api(compose.uiTooling)
                 implementation(compose.preview)
 
-
-                // aws cognito authentication
-                implementation("software.amazon.awssdk:cognitoidentityprovider:2.20.134")
+                implementation("io.ktor:ktor-server-core:$ktorVersion")
+                implementation("io.ktor:ktor-server-netty:$ktorVersion")
             }
         }
     }

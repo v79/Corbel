@@ -4,5 +4,5 @@ import org.liamjd.cantilever.corbel.models.SubmitUser
 
 interface AuthenticationService {
 
-    fun login(user: SubmitUser)
+    suspend fun login(user: SubmitUser)
 }

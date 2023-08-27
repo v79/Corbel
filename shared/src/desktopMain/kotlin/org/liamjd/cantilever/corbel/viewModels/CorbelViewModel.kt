@@ -2,6 +2,7 @@ package org.liamjd.cantilever.corbel.viewModels
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.runBlocking
 import org.liamjd.cantilever.corbel.models.SubmitUser
 import org.liamjd.cantilever.corbel.services.auth.AuthenticationService
 import org.liamjd.cantilever.corbel.services.auth.CognitoAuthService
@@ -30,13 +31,17 @@ class CorbelViewModel {
     fun login(newUser: SubmitUser) {
         _mode.value = Mode.BUSY
 
-        println("Calling auth service")
-        authService.login(newUser)
+        runBlocking {
+
+            println("Calling auth service")
+            authService.login(newUser)
 
 
-        _user.value = newUser
-        _mode.value = Mode.VIEWING
-        _windowTitle.value = "Corbel Editor (${_mode.value.name}) [${_user.value.username ?: ""}]"
+            _user.value = newUser
+            _mode.value = Mode.VIEWING
+            _windowTitle.value =
+                "Corbel Editor (${_mode.value.name}) [${_user.value.username ?: ""}]"
+        }
     }
 
     fun logout() {

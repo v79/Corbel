@@ -11,6 +11,10 @@ import com.mayakapps.compose.windowstyler.WindowStyle
 import org.liamjd.cantilever.corbel.DesktopApp
 
 fun main() = application {
+
+
+
+
     val dark = isSystemInDarkTheme()
     val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
     val windowTitle = remember { mutableStateOf("Corbel Editor") }
