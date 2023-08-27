@@ -36,6 +36,7 @@ kotlin {
                 implementation(compose.material3)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+
             }
         }
         val androidMain by getting {
@@ -59,6 +60,10 @@ kotlin {
                 implementation(compose.desktop.common)
                 api(compose.uiTooling)
                 implementation(compose.preview)
+
+
+                // aws cognito authentication
+                implementation("software.amazon.awssdk:cognitoidentityprovider:2.20.134")
             }
         }
     }
