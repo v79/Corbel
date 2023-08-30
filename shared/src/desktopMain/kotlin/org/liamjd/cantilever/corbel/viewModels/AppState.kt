@@ -6,6 +6,7 @@ package org.liamjd.cantilever.corbel.viewModels
  */
 enum class Mode {
     UNAUTHENTICATED,
+    BUSY_AWAITING_AUTH,
     BUSY,
     VIEWING,
     NEW_ITEM,

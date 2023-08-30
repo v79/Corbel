@@ -39,7 +39,7 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
     val viewModel = remember { CorbelViewModel() }
     val mode = remember { viewModel.mode }
     val user = remember { viewModel.user }
-    val showLoginDialog by remember { derivedStateOf { mode.value == Mode.UNAUTHENTICATED } }
+    val showLoginDialog by remember { derivedStateOf { mode.value != Mode.VIEWING } } // needs to be cleverer
     val windowTitle = remember { viewModel.windowTitle }
 
     val colorScheme = if (isDark) DarkColors else LightColors
