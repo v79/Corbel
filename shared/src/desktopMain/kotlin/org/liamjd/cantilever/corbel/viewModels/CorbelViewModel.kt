@@ -2,7 +2,9 @@ package org.liamjd.cantilever.corbel.viewModels
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.liamjd.cantilever.corbel.models.SubmitUser
 import org.liamjd.cantilever.corbel.services.CantileverService
@@ -36,25 +38,23 @@ class CorbelViewModel {
      * Initiate the login process by calling the authService.login() method.
      * Await for the Cognito auth code then refresh the UI model and store the auth code here
      */
-    fun login(newUser: SubmitUser) {
+    suspend fun login(newUser: SubmitUser, scope: CoroutineScope) {
         _mode.value = Mode.BUSY_AWAITING_AUTH
         _authCode = null
 
-        runBlocking {
-            val awaitCode = async {
-                authService.login(newUser)
-            }
-            val code = awaitCode.await()
-            if (code != null) {
-                println("Received code $code")
-                _user.value = newUser
-                _authCode = code
-                _mode.value = Mode.VIEWING
-                _windowTitle.value =
-                    "Corbel Editor (${_mode.value.name}) [${_user.value.username ?: ""}]"
-                // prove it works by getting some real data
-                cantileverService.getPostListJson(_authCode!!)
-            }
+        val awaitCode = scope.async {
+            authService.login(newUser)
+        }
+        val code = awaitCode.await()
+        if (code != null) {
+            println("Received code $code")
+            _user.value = newUser
+            _authCode = code
+            _mode.value = Mode.VIEWING
+            _windowTitle.value =
+                "Corbel Editor (${_mode.value.name}) [${_user.value.username ?: ""}]"
+            // prove it works by getting some real data
+            cantileverService.getPostListJson(_authCode!!)
         }
     }
 
