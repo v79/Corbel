@@ -1,4 +1,4 @@
-package org.liamjd.cantilever.corbel.ui.models
+package org.liamjd.cantilever.corbel.models
 
 enum class Tabs {
     POSTS,

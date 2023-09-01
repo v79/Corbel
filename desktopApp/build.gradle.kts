@@ -8,6 +8,7 @@ plugins {
 kotlin {
     jvm()
     sourceSets {
+        val ktorVersion = extra["ktor.version"] as String
         val jvmMain by getting  {
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -20,6 +21,10 @@ kotlin {
                 // previews
                 implementation(compose.preview)
                 implementation(compose.uiTooling)
+
+                // ktor server
+                implementation("io.ktor:ktor-server-core:$ktorVersion")
+                implementation("io.ktor:ktor-server-netty:$ktorVersion")
             }
         }
     }

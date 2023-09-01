@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,14 +23,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.liamjd.cantilever.corbel.models.SubmitUser
 import org.liamjd.cantilever.corbel.ui.md_theme_dark_onSecondary
-import org.liamjd.cantilever.corbel.ui.models.SubmitUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginDialog(onDismiss: () -> Unit, onSubmit: (SubmitUser) -> Unit) {
-    var usernmame by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val formValid = remember { derivedStateOf { username.isNotBlank() && password.isNotBlank() } }
 
     Column(
         Modifier.fillMaxHeight(0.5f).padding(top = 20.dp),
@@ -50,9 +53,9 @@ fun LoginDialog(onDismiss: () -> Unit, onSubmit: (SubmitUser) -> Unit) {
                 ) {
                     Text("Login to Corbel")
                     OutlinedTextField(
-                        value = usernmame,
+                        value = username,
                         singleLine = true,
-                        onValueChange = { usernmame = it },
+                        onValueChange = { username = it },
                         label = { Text("Username") },
                         placeholder = { Text("example@gmail.com") },
                     )
@@ -70,7 +73,10 @@ fun LoginDialog(onDismiss: () -> Unit, onSubmit: (SubmitUser) -> Unit) {
                         OutlinedButton(onClick = onDismiss) {
                             Text("Cancel")
                         }
-                        ElevatedButton(onClick = { onSubmit(SubmitUser(usernmame,password)) }) {
+                        ElevatedButton(
+                            onClick = { onSubmit(SubmitUser(username, password)) },
+                            enabled = formValid.value
+                        ) {
                             Text("Login")
                         }
                     }

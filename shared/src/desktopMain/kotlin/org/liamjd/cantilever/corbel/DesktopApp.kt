@@ -16,52 +16,59 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
+import org.liamjd.cantilever.corbel.models.Tabs
 import org.liamjd.cantilever.corbel.ui.AppTheme
 import org.liamjd.cantilever.corbel.ui.DarkColors
 import org.liamjd.cantilever.corbel.ui.LightColors
-import org.liamjd.cantilever.corbel.ui.models.Tabs
-
+import org.liamjd.cantilever.corbel.viewModels.CorbelViewModel
+import org.liamjd.cantilever.corbel.viewModels.Mode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DesktopApp(isDark: Boolean = true) {
-    var appState by remember { mutableStateOf(AppState()) }
+fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
+    val viewModel = remember { CorbelViewModel() }
+    val mode = remember { viewModel.mode }
+    val windowTitle = remember { viewModel.windowTitle }
+    val crScope = rememberCoroutineScope()
 
-    var showLoginDialog by remember { mutableStateOf(false) }
     val colorScheme = if (isDark) DarkColors else LightColors
     val currentTab = mutableStateOf(Tabs.POSTS)
+    window.title = windowTitle.value
 
     AppTheme(useDarkTheme = isDark) {
         Surface(Modifier.fillMaxSize(), color = colorScheme.surface) {
-
-            if (showLoginDialog) {
-                LoginDialog(onDismiss = {showLoginDialog = false}, onSubmit = { println(it)})
-            } else {
-                Column(Modifier.padding(4.dp)) {
-                    if (appState.mode == Mode.UNAUTHENTICATED) {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            FilledTonalButton(
-                                onClick = { showLoginDialog = true },
-                                colors = ButtonDefaults.filledTonalButtonColors()
-                            ) {
+            Column(Modifier.padding(4.dp)) {
+                // Determine what we need to display based on the mode
+                when (mode.value) {
+                    Mode.UNAUTHENTICATED -> {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            ElevatedButton(onClick = { crScope.launch { viewModel.login() } }) {
                                 Text("Login")
                             }
                         }
-                    } else {
+                    }
+
+                    Mode.BUSY_AWAITING_AUTH -> {
+                        Text("Awaiting authentication")
+                    }
+
+                    Mode.BUSY -> {
+                        Text("Busy")
+                    }
+
+                    Mode.VIEWING -> {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                             FilledTonalButton(onClick = {
-                                appState = appState.copy(mode = Mode.UNAUTHENTICATED)
+                                viewModel.logout()
                             }) {
                                 Text("Logout")
                             }
@@ -91,6 +98,7 @@ fun DesktopApp(isDark: Boolean = true) {
 
                             }
                         }
+                        Spacer(Modifier.height(8.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                             Column {
                                 ElevatedButton(
@@ -104,10 +112,17 @@ fun DesktopApp(isDark: Boolean = true) {
                             }
                         }
                     }
+
+                    Mode.NEW_ITEM -> {
+                        Text("New item")
+                    }
+
+                    Mode.EDITING -> {
+                        Text("Editing")
+                    }
                 }
             }
         }
     }
 }
-
 

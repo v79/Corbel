@@ -3,6 +3,7 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
     id("org.jetbrains.compose")
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 kotlin {
@@ -29,6 +30,7 @@ kotlin {
     }
 
     sourceSets {
+        val ktorVersion = extra["ktor.version"] as String
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
@@ -36,6 +38,16 @@ kotlin {
                 implementation(compose.material3)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
+                implementation("io.ktor:ktor-client-logging:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+                implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+                implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+
             }
         }
         val androidMain by getting {
@@ -59,6 +71,9 @@ kotlin {
                 implementation(compose.desktop.common)
                 api(compose.uiTooling)
                 implementation(compose.preview)
+
+                implementation("io.ktor:ktor-server-core:$ktorVersion")
+                implementation("io.ktor:ktor-server-netty:$ktorVersion")
             }
         }
     }

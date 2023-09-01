@@ -15,8 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.em
 import org.liamjd.cantilever.corbel.ui.DarkColors
-import org.liamjd.cantilever.corbel.ui.LightColors
-import org.liamjd.cantilever.corbel.ui.models.Tabs
+import org.liamjd.cantilever.corbel.models.Tabs
 
 @Composable
 fun TabBar(colorScheme: ColorScheme, onTabChange: (Int) -> Unit) {
