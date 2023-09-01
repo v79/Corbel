@@ -16,7 +16,7 @@ import org.liamjd.cantilever.corbel.services.auth.CognitoAuthService
  */
 class CorbelViewModel {
     private val authService: AuthenticationService = CognitoAuthService()
-    private val cantileverService: CantileverService = CantileverService()
+    private val cantileverService: CantileverService = CantileverService(authService)
 
     private val _mode = mutableStateOf(Mode.UNAUTHENTICATED)
     val mode: State<Mode>
@@ -38,17 +38,13 @@ class CorbelViewModel {
      * Initiate the login process by calling the authService.login() method.
      * Await for the Cognito auth code then refresh the UI model and store the auth code here
      */
-    suspend fun login(newUser: SubmitUser, scope: CoroutineScope) {
+    suspend fun login() {
         _mode.value = Mode.BUSY_AWAITING_AUTH
         _authCode = null
-
-        val awaitCode = scope.async {
-            authService.login(newUser)
-        }
-        val code = awaitCode.await()
+        val code = authService.login()
+        delay(500)
         if (code != null) {
             println("Received code $code")
-            _user.value = newUser
             _authCode = code
             _mode.value = Mode.VIEWING
             _windowTitle.value =

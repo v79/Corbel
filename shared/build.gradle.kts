@@ -44,6 +44,10 @@ kotlin {
                 implementation("io.ktor:ktor-client-logging:$ktorVersion")
                 implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+                implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+                implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+
             }
         }
         val androidMain by getting {

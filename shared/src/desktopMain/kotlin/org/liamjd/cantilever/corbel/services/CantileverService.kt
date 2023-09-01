@@ -8,20 +8,15 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
-import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
-import io.ktor.http.Parameters
-import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
-import org.liamjd.cantilever.corbel.services.auth.CognitoIDToken
+import org.liamjd.cantilever.corbel.services.auth.AuthenticationService
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
-class CantileverService {
+class CantileverService(private val authService: AuthenticationService) {
 
     // TODO: Move these to a config file
     private val poolId = "eu-west-2_aSdFDvU0j"
@@ -29,7 +24,6 @@ class CantileverService {
     private val fedPoolId = ""
     private val customDomain = "https://cantilever.auth.eu-west-2.amazoncognito.com"
     private val region = "eu-west-2"
-
     private val callbackUrl = "http://localhost:44817/callback"
 
     @Suppress("NewApi")
@@ -42,7 +36,6 @@ class CantileverService {
                 override fun log(message: String) {
                     println("Ktor Client: $message")
                 }
-
             }
         }
         install(ContentNegotiation) {
@@ -55,12 +48,12 @@ class CantileverService {
      */
     suspend fun getPostListJson(authCode: String): String {
         val url = "https://api.cantilevers.org/project/posts"
-        val token = getToken(authCode)
+        val token = authService.getToken(authCode)
 
         val response = client.get(url) {
             headers {
                 accept(ContentType.Application.Json)
-                bearerAuth(token)
+                bearerAuth(token.idToken)
             }
         }
 
@@ -69,33 +62,5 @@ class CantileverService {
         return "{}"
     }
 
-    /**
-     * Get a Bearer token for the supplied Cognito authorization code
-     */
-    private suspend fun getToken(authCode: String): String {
-        println("Calling getToken() for code: $authCode")
-        val grantType = "authorization_code"
-        val getTokenURL =
-            "https://cantilever.auth.eu-west-2.amazoncognito.com/oauth2/token"
 
-        val tokenResponse = client.post(getTokenURL) {
-            headers {
-                contentType(ContentType.Application.FormUrlEncoded)
-                accept(ContentType.Application.Json)
-            }
-            setBody(
-                FormDataContent(
-                    Parameters.build {
-                        append("grant_type", grantType)
-                        append("client_id", clientAppId)
-                        append("code", authCode)
-                        append("redirect_uri", callbackUrl)
-                    }
-                )
-            )
-        }
-        val idToken: CognitoIDToken = tokenResponse.body()
-
-        return idToken.accessToken
-    }
 }

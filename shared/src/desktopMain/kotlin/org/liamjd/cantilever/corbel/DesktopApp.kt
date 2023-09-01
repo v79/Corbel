@@ -46,25 +46,26 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
 
     AppTheme(useDarkTheme = isDark) {
         Surface(Modifier.fillMaxSize(), color = colorScheme.surface) {
+            Column(Modifier.padding(4.dp)) {
+                // Determine what we need to display based on the mode
+                when (mode.value) {
+                    Mode.UNAUTHENTICATED -> {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            ElevatedButton(onClick = { crScope.launch { viewModel.login() } }) {
+                                Text("Login")
+                            }
+                        }
+                    }
 
-            // Determine what we need to display based on the mode
-            when (mode.value) {
-                Mode.UNAUTHENTICATED -> {
-                    LoginDialog(
-                        onDismiss = { },
-                        onSubmit = { crScope.launch { viewModel.login(it, this) } })
-                }
+                    Mode.BUSY_AWAITING_AUTH -> {
+                        Text("Awaiting authentication")
+                    }
 
-                Mode.BUSY_AWAITING_AUTH -> {
-                    Text("Awaiting authentication")
-                }
+                    Mode.BUSY -> {
+                        Text("Busy")
+                    }
 
-                Mode.BUSY -> {
-                    Text("Busy")
-                }
-
-                Mode.VIEWING -> {
-                    Column(Modifier.padding(4.dp)) {
+                    Mode.VIEWING -> {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                             FilledTonalButton(onClick = {
                                 viewModel.logout()
@@ -110,21 +111,18 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
                                 }
                             }
                         }
+                    }
 
+                    Mode.NEW_ITEM -> {
+                        Text("New item")
+                    }
+
+                    Mode.EDITING -> {
+                        Text("Editing")
                     }
                 }
-
-                Mode.NEW_ITEM -> {
-                    Text("New item")
-                }
-
-                Mode.EDITING -> {
-                    Text("Editing")
-                }
             }
-
         }
     }
 }
-
 
