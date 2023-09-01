@@ -34,7 +34,7 @@ class CantileverService(private val authService: AuthenticationService) {
         install(Logging) {
             logger = object : Logger {
                 override fun log(message: String) {
-                    println("Ktor Client: $message")
+//                    println("Ktor Client: $message")
                 }
             }
         }
@@ -47,6 +47,7 @@ class CantileverService(private val authService: AuthenticationService) {
      * Get posts.json. Eventually, replace this with deserialized list of Post objects
      */
     suspend fun getPostListJson(authCode: String): String {
+        println("Getting post list json file")
         val url = "https://api.cantilevers.org/project/posts"
         val token = authService.getToken(authCode)
 

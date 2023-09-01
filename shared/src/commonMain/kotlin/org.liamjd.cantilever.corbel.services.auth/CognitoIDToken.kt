@@ -29,5 +29,20 @@ class CognitoIDToken(
 
     fun isEmpty() = accessToken.isEmpty()
 
-    fun expired() = Clock.System.now().minus(createdTime).inWholeMilliseconds > expiresIn
+    /**
+     * Returns true if the difference between now and the createdTime is greater than the expiresIn value (seconds)
+     */
+    fun expired() = Clock.System.now().minus(createdTime).inWholeSeconds > expiresIn
+
 }
+
+/**
+ * Build a new [CognitoIDToken] from the supplied [CognitoRefreshToken]
+ */
+fun CognitoIDToken.refresh(refreshToken: CognitoRefreshToken) = CognitoIDToken(
+    accessToken = refreshToken.accessToken,
+    expiresIn = refreshToken.expiresIn,
+    idToken = refreshToken.idToken,
+    refreshToken = this.refreshToken,
+    tokenType = this.tokenType
+)

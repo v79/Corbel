@@ -78,7 +78,7 @@ class CognitoAuthService : AuthenticationService {
         install(Logging) {
             logger = object : io.ktor.client.plugins.logging.Logger {
                 override fun log(message: String) {
-                    println("Ktor Client: $message")
+//                    println("Ktor Client: $message")
                 }
             }
         }
@@ -94,7 +94,7 @@ class CognitoAuthService : AuthenticationService {
      * This waits indefinitely; I should change that!
      */
     override suspend fun login(): String? {
-        var maxWaitMilliseconds = 30*1000
+        var maxWaitMilliseconds = 30 * 1000
         val cognitoUrl =
             "https://cantilever.auth.eu-west-2.amazoncognito.com/oauth2/authorize?response_type=code&client_id=$clientAppId&redirect_uri=$encodedCallbackUrl&scope=aws.cognito.signin.user.admin+email+openid"
         try {
@@ -134,10 +134,13 @@ class CognitoAuthService : AuthenticationService {
     override suspend fun getToken(authCode: String): CognitoIDToken {
         println("Calling getToken() for code: $authCode")
         val grantType = "authorization_code"
+        val refreshType = "refresh_token"
         val getTokenURL =
             "https://cantilever.auth.eu-west-2.amazoncognito.com/oauth2/token"
 
-        if(token.isEmpty()) {
+        println("Current token: $token; isExpired=${token.expired()}")
+
+        if (token.isEmpty()) {
             val tokenResponse = client.post(getTokenURL) {
                 headers {
                     contentType(ContentType.Application.FormUrlEncoded)
@@ -155,9 +158,29 @@ class CognitoAuthService : AuthenticationService {
                 )
             }
             token = tokenResponse.body<CognitoIDToken>()
-        } else if(token.expired()) {
+        } else if (token.expired()) {
             println("Token has expired; refresh it? {created ${token.createdTime}}")
+            val refreshResponse = client.post(getTokenURL) {
+                headers {
+                    contentType(ContentType.Application.FormUrlEncoded)
+                    accept(ContentType.Application.Json)
+                }
+                setBody(
+                    FormDataContent(
+                        Parameters.build {
+                            append("grant_type", refreshType)
+                            append("client_id", clientAppId)
+                            append("refresh_token", token.refreshToken)
+                            append("redirect_uri", callbackUrl)
+                        }
+                    )
+                )
+            }
+            val refreshedToken = refreshResponse.body<CognitoRefreshToken>()
+            println("RefreshToken response: $refreshedToken")
+            token = token.refresh(refreshedToken)
         }
+        println("Got or updated token. Is now $token")
         return token
     }
 }
