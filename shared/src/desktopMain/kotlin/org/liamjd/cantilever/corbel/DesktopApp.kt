@@ -8,11 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +27,7 @@ import org.liamjd.cantilever.corbel.models.Tabs
 import org.liamjd.cantilever.corbel.ui.AppTheme
 import org.liamjd.cantilever.corbel.ui.DarkColors
 import org.liamjd.cantilever.corbel.ui.LightColors
+import org.liamjd.cantilever.corbel.ui.components.StatusBar
 import org.liamjd.cantilever.corbel.viewModels.CorbelViewModel
 import org.liamjd.cantilever.corbel.viewModels.Mode
 
@@ -46,80 +45,81 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
 
     AppTheme(useDarkTheme = isDark) {
         Surface(Modifier.fillMaxSize(), color = colorScheme.surface) {
-            Column(Modifier.padding(4.dp)) {
-                // Determine what we need to display based on the mode
-                when (mode.value) {
-                    Mode.UNAUTHENTICATED -> {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            ElevatedButton(onClick = { crScope.launch { viewModel.login() } }) {
-                                Text("Login")
+            Column(Modifier.padding(4.dp), verticalArrangement = Arrangement.SpaceBetween) {
+                Column {
+                    Row(Modifier.fillMaxWidth()) {
+
+                        // Determine what we need to display based on the mode
+                        when (mode.value) {
+                            Mode.UNAUTHENTICATED -> {
+                                ElevatedButton(onClick = { crScope.launch { viewModel.login() } }) {
+                                    Text("Login")
+                                }
                             }
-                        }
-                    }
 
-                    Mode.BUSY_AWAITING_AUTH -> {
-                        Text("Awaiting authentication")
-                    }
-
-                    Mode.BUSY -> {
-                        Text("Busy")
-                    }
-
-                    Mode.VIEWING -> {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            FilledTonalButton(onClick = {
-                                viewModel.logout()
-                            }) {
-                                Text("Logout")
+                            Mode.BUSY_AWAITING_AUTH -> {
+                                Text("Awaiting authentication")
                             }
-                        }
-                        Row {
-                            TabBar(colorScheme = colorScheme, onTabChange = {
-                                when (it) {
-                                    0 -> currentTab.value = Tabs.POSTS
-                                    1 -> currentTab.value = Tabs.PAGES
-                                    2 -> currentTab.value = Tabs.TEMPLATES
-                                    else -> {
-                                        currentTab.value = Tabs.POSTS
+
+                            Mode.BUSY -> {
+                                Text("Busy")
+                            }
+
+                            Mode.VIEWING -> {
+                                Column(Modifier.fillMaxWidth()) {
+                                    Row(
+                                        Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        FilledTonalButton(onClick = {
+                                            viewModel.logout()
+                                        }) {
+                                            Text("Logout")
+                                        }
+                                    }
+                                    Row(Modifier.fillMaxWidth()) {
+                                        TabBar(colorScheme = colorScheme, onTabChange = {
+                                            when (it) {
+                                                0 -> currentTab.value = Tabs.POSTS
+                                                1 -> currentTab.value = Tabs.PAGES
+                                                2 -> currentTab.value = Tabs.TEMPLATES
+                                                else -> {
+                                                    currentTab.value = Tabs.POSTS
+                                                }
+                                            }
+                                        })
+                                    }
+                                    Spacer(Modifier.height(8.dp))
+                                    Row(
+                                        Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Column {
+                                            Text(
+                                                currentTab.value.name,
+                                                fontSize = TextUnit(
+                                                    8f,
+                                                    TextUnitType.Em
+                                                )
+                                            )
+
+                                        }
                                     }
                                 }
-                            })
-                        }
-                        Spacer(Modifier.height(8.dp))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                            Column {
-                                Text(
-                                    currentTab.value.name,
-                                    fontSize = TextUnit(
-                                        8f,
-                                        TextUnitType.Em
-                                    )
-                                )
-
                             }
-                        }
-                        Spacer(Modifier.height(8.dp))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                            Column {
-                                ElevatedButton(
-                                    onClick = { },
-                                    colors = ButtonDefaults.elevatedButtonColors()
-                                ) {
-                                    OutlinedTextField(
-                                        value = "Theming is weird",
-                                        onValueChange = {})
-                                }
+
+                            Mode.NEW_ITEM -> {
+                                Text("New item")
+                            }
+
+                            Mode.EDITING -> {
+                                Text("Editing")
                             }
                         }
                     }
-
-                    Mode.NEW_ITEM -> {
-                        Text("New item")
-                    }
-
-                    Mode.EDITING -> {
-                        Text("Editing")
-                    }
+                }
+                Row(Modifier.weight(1f, false).fillMaxWidth()) {
+                    StatusBar(left = { Text("Left")}, center = { Text("Center")}, right = { Text("Right")})
                 }
             }
         }
