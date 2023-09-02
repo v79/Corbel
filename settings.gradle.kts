@@ -1,4 +1,4 @@
-rootProject.name = "MyApplication"
+rootProject.name = "Corbel Editor"
 
 include(":androidApp")
 include(":shared")
