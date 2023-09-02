@@ -1,5 +1,6 @@
 package org.liamjd.cantilever.corbel
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -119,7 +120,9 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
                     }
                 }
                 Row(Modifier.weight(1f, false).fillMaxWidth()) {
-                    StatusBar(left = { Text("Left")}, center = { Text("Center")}, right = { Text("Right")})
+//                    StatusBar(left = { Text("Left")}, center = { Text("Center")}, right = { Text("Right")})
+                    val count = mutableStateOf(1)
+                    StatusBar(right = { Text(text="Right is good, but not in politics ${count.value}", modifier = Modifier.clickable { count.value++ }) })
                 }
             }
         }
