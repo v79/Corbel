@@ -27,7 +27,12 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.ktor.server.plugins.contentnegotiation.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.awt.Desktop
 import java.io.IOException
 import java.net.URI
@@ -94,7 +99,7 @@ class CognitoAuthService : AuthenticationService {
      * This waits indefinitely; I should change that!
      */
     override suspend fun login(): String? {
-        var maxWaitMilliseconds = 30 * 1000
+        var code: String? = null
         val cognitoUrl =
             "https://cantilever.auth.eu-west-2.amazoncognito.com/oauth2/authorize?response_type=code&client_id=$clientAppId&redirect_uri=$encodedCallbackUrl&scope=aws.cognito.signin.user.admin+email+openid"
         try {
@@ -112,11 +117,34 @@ class CognitoAuthService : AuthenticationService {
             return null
         }
 
-        while (authCode == null) {
-            print('.')
+        val job = GlobalScope.launch {
+            code = waitForAuthCodeOrNull()
+            authCode = code
+        }
+        runBlocking {
+            job.join()
+        }
+        if (authCode == null) {
+            println("Timeout while waiting for authentication code.")
         }
         return authCode
     }
+
+    /**
+     * Wait for 30 seconds or return as soon as authCode has a value
+     */
+    private suspend fun waitForAuthCodeOrNull(): String? {
+        return withTimeoutOrNull(30_000) {
+            while (true) {
+                if (authCode != null) {
+                    return@withTimeoutOrNull authCode
+                }
+                delay(100)
+            }
+            null
+        }
+    }
+
 
     /**
      * All the AWS Cognito logout URL which should clear our auth token

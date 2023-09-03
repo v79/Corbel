@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Surface
@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.unit.TextUnit
@@ -53,13 +54,28 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
                         // Determine what we need to display based on the mode
                         when (mode.value) {
                             Mode.UNAUTHENTICATED -> {
-                                ElevatedButton(onClick = { crScope.launch { viewModel.login() } }) {
-                                    Text("Login")
+                                Row(
+                                    Modifier.fillMaxSize(),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    FilledTonalButton(onClick = { crScope.launch { viewModel.login() } }) {
+                                        Text("Login")
+                                    }
                                 }
                             }
 
                             Mode.BUSY_AWAITING_AUTH -> {
-                                Text("Awaiting authentication")
+                                Row(
+                                    Modifier.fillMaxSize(),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Awaiting authentication")
+                                        CircularProgressIndicator()
+                                    }
+                                }
                             }
 
                             Mode.BUSY -> {
@@ -120,9 +136,12 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
                     }
                 }
                 Row(Modifier.weight(1f, false).fillMaxWidth()) {
-//                    StatusBar(left = { Text("Left")}, center = { Text("Center")}, right = { Text("Right")})
                     val count = mutableStateOf(1)
-                    StatusBar(right = { Text(text="Right is good, but not in politics ${count.value}", modifier = Modifier.clickable { count.value++ }) })
+                    StatusBar(right = {
+                        Text(
+                            text = "Right is good, but not in politics ${count.value}",
+                            modifier = Modifier.clickable { count.value++ })
+                    })
                 }
             }
         }

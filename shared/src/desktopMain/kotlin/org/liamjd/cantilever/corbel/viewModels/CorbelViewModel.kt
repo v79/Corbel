@@ -34,6 +34,7 @@ class CorbelViewModel {
             return _windowTitle
         }
 
+
     /**
      * Initiate the login process by calling the authService.login() method.
      * Await for the Cognito auth code then refresh the UI model and store the auth code here
@@ -48,9 +49,7 @@ class CorbelViewModel {
             _authCode = code
             _mode.value = Mode.VIEWING
             _windowTitle.value =
-                "Corbel Editor (${_mode.value.name}) [${_user.value.username ?: ""}]"
-            // prove it works by getting some real data
-            cantileverService.getPostListJson(_authCode!!)
+                "Corbel Editor (${_mode.value.name})"
         }
     }
 
