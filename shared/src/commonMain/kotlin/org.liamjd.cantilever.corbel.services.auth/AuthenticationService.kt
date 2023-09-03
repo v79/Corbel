@@ -20,4 +20,6 @@ interface AuthenticationService {
     * Refresh or get an authentication token for the given code
     */
    suspend fun getToken(authCode: String): CognitoIDToken
+
+   val authCode: String
 }

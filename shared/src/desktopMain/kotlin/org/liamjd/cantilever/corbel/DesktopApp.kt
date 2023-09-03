@@ -40,6 +40,7 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
     val mode = remember { viewModel.mode }
     val windowTitle = remember { viewModel.windowTitle }
     val crScope = rememberCoroutineScope()
+    val posts = remember { viewModel.postJson }
 
     val colorScheme = if (isDark) DarkColors else LightColors
     val currentTab = mutableStateOf(Tabs.POSTS)
@@ -107,21 +108,7 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
                                         })
                                     }
                                     Spacer(Modifier.height(8.dp))
-                                    Row(
-                                        Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        Column {
-                                            Text(
-                                                currentTab.value.name,
-                                                fontSize = TextUnit(
-                                                    8f,
-                                                    TextUnitType.Em
-                                                )
-                                            )
-
-                                        }
-                                    }
+                                    Text(text = posts.value)
                                 }
                             }
 

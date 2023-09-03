@@ -44,7 +44,10 @@ import java.nio.charset.Charset
  */
 class CognitoAuthService : AuthenticationService {
 
-    private var authCode: String? = null
+    private var _authCode: String? = null
+    override val authCode: String
+        get() = _authCode ?: ""
+
     private var token: CognitoIDToken = CognitoIDToken()
 
     val server = embeddedServer(Netty, port = 44817, configure = {
@@ -54,13 +57,13 @@ class CognitoAuthService : AuthenticationService {
 
         routing {
             get("/callback") {
-                authCode = null
+                _authCode = null
                 println("Callback received by server for ${call.request.uri}")
                 val code = call.request.queryParameters["code"]
                 println("Ktor: Received an auth code : '$code'")
                 call.respondText("Authentication code received. Please close this browser window and return to the Corbel application")
                 if (code != null) {
-                    authCode = code
+                    _authCode = code
                 }
             }
         }
@@ -99,7 +102,7 @@ class CognitoAuthService : AuthenticationService {
      * This waits indefinitely; I should change that!
      */
     override suspend fun login(): String? {
-        var code: String? = null
+        var code: String?
         val cognitoUrl =
             "https://cantilever.auth.eu-west-2.amazoncognito.com/oauth2/authorize?response_type=code&client_id=$clientAppId&redirect_uri=$encodedCallbackUrl&scope=aws.cognito.signin.user.admin+email+openid"
         try {
@@ -119,15 +122,13 @@ class CognitoAuthService : AuthenticationService {
 
         val job = GlobalScope.launch {
             code = waitForAuthCodeOrNull()
-            authCode = code
+            _authCode = code
         }
-        runBlocking {
-            job.join()
-        }
-        if (authCode == null) {
+        job.join()
+        if (_authCode == null) {
             println("Timeout while waiting for authentication code.")
         }
-        return authCode
+        return _authCode
     }
 
     /**
@@ -136,8 +137,8 @@ class CognitoAuthService : AuthenticationService {
     private suspend fun waitForAuthCodeOrNull(): String? {
         return withTimeoutOrNull(30_000) {
             while (true) {
-                if (authCode != null) {
-                    return@withTimeoutOrNull authCode
+                if (_authCode != null) {
+                    return@withTimeoutOrNull _authCode
                 }
                 delay(100)
             }
@@ -156,7 +157,7 @@ class CognitoAuthService : AuthenticationService {
             method = HttpMethod.Get
         }
         println("Ktor Client: Logout response: $logoutResponse")
-        authCode = null
+        _authCode = null
     }
 
     override suspend fun getToken(authCode: String): CognitoIDToken {
