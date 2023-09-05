@@ -51,7 +51,6 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
             Column(Modifier.padding(4.dp), verticalArrangement = Arrangement.SpaceBetween) {
                 Column {
                     Row(Modifier.fillMaxWidth()) {
-
                         // Determine what we need to display based on the mode
                         when (mode.value) {
                             Mode.UNAUTHENTICATED -> {
@@ -108,7 +107,7 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
                                         })
                                     }
                                     Spacer(Modifier.height(8.dp))
-                                    Text(text = posts.value)
+                                    Text(text = posts.value.take(150))
                                 }
                             }
 
@@ -122,7 +121,7 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
                         }
                     }
                 }
-                Row(Modifier.weight(1f, false).fillMaxWidth()) {
+                Row(Modifier.weight(2f, false).fillMaxWidth()) {
                     val count = mutableStateOf(1)
                     StatusBar(right = {
                         Text(
