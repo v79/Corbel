@@ -2,11 +2,7 @@ package org.liamjd.cantilever.corbel.viewModels
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import org.liamjd.cantilever.corbel.models.SubmitUser
 import org.liamjd.cantilever.corbel.services.CantileverService
@@ -36,9 +32,13 @@ class CorbelViewModel {
             return _windowTitle
         }
 
-
     private val _postJson = mutableStateOf("{}")
     val postJson: State<String> = _postJson
+
+    init {
+        // On application initialization, ping the Cantilever API to warm the lambda function
+        cantileverService.warm()
+    }
 
     /**
      * Initiate the login process by calling the authService.login() method.
