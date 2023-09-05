@@ -2,8 +2,6 @@ package org.liamjd.cantilever.corbel.viewModels
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.liamjd.cantilever.corbel.models.SubmitUser
@@ -34,6 +32,14 @@ class CorbelViewModel {
             return _windowTitle
         }
 
+    private val _postJson = mutableStateOf("{}")
+    val postJson: State<String> = _postJson
+
+    init {
+        // On application initialization, ping the Cantilever API to warm the lambda function
+        cantileverService.warm()
+    }
+
     /**
      * Initiate the login process by calling the authService.login() method.
      * Await for the Cognito auth code then refresh the UI model and store the auth code here
@@ -48,9 +54,9 @@ class CorbelViewModel {
             _authCode = code
             _mode.value = Mode.VIEWING
             _windowTitle.value =
-                "Corbel Editor (${_mode.value.name}) [${_user.value.username ?: ""}]"
-            // prove it works by getting some real data
-            cantileverService.getPostListJson(_authCode!!)
+                "Corbel Editor (${_mode.value.name})"
+            println("Getting posts after login")
+            getPosts()
         }
     }
 
@@ -63,6 +69,11 @@ class CorbelViewModel {
             _user.value = SubmitUser(null, null)
             _mode.value = Mode.UNAUTHENTICATED
             _windowTitle.value = "Corbel Editor (${_mode.value.name})"
+            _postJson.value = ""
         }
+    }
+
+    private suspend fun getPosts() {
+        _postJson.value = cantileverService.getPostListJson()
     }
 }

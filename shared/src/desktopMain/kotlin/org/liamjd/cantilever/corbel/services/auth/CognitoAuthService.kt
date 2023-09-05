@@ -27,7 +27,12 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.ktor.server.plugins.contentnegotiation.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.awt.Desktop
 import java.io.IOException
 import java.net.URI
@@ -39,7 +44,10 @@ import java.nio.charset.Charset
  */
 class CognitoAuthService : AuthenticationService {
 
-    private var authCode: String? = null
+    private var _authCode: String? = null
+    override val authCode: String
+        get() = _authCode ?: ""
+
     private var token: CognitoIDToken = CognitoIDToken()
 
     val server = embeddedServer(Netty, port = 44817, configure = {
@@ -49,13 +57,13 @@ class CognitoAuthService : AuthenticationService {
 
         routing {
             get("/callback") {
-                authCode = null
+                _authCode = null
                 println("Callback received by server for ${call.request.uri}")
                 val code = call.request.queryParameters["code"]
                 println("Ktor: Received an auth code : '$code'")
                 call.respondText("Authentication code received. Please close this browser window and return to the Corbel application")
                 if (code != null) {
-                    authCode = code
+                    _authCode = code
                 }
             }
         }
@@ -94,7 +102,7 @@ class CognitoAuthService : AuthenticationService {
      * This waits indefinitely; I should change that!
      */
     override suspend fun login(): String? {
-        var maxWaitMilliseconds = 30 * 1000
+        var code: String?
         val cognitoUrl =
             "https://cantilever.auth.eu-west-2.amazoncognito.com/oauth2/authorize?response_type=code&client_id=$clientAppId&redirect_uri=$encodedCallbackUrl&scope=aws.cognito.signin.user.admin+email+openid"
         try {
@@ -112,11 +120,32 @@ class CognitoAuthService : AuthenticationService {
             return null
         }
 
-        while (authCode == null) {
-            print('.')
+        val job = GlobalScope.launch {
+            code = waitForAuthCodeOrNull()
+            _authCode = code
         }
-        return authCode
+        job.join()
+        if (_authCode == null) {
+            println("Timeout while waiting for authentication code.")
+        }
+        return _authCode
     }
+
+    /**
+     * Wait for 30 seconds or return as soon as authCode has a value
+     */
+    private suspend fun waitForAuthCodeOrNull(): String? {
+        return withTimeoutOrNull(30_000) {
+            while (true) {
+                if (_authCode != null) {
+                    return@withTimeoutOrNull _authCode
+                }
+                delay(100)
+            }
+            null
+        }
+    }
+
 
     /**
      * All the AWS Cognito logout URL which should clear our auth token
@@ -128,7 +157,7 @@ class CognitoAuthService : AuthenticationService {
             method = HttpMethod.Get
         }
         println("Ktor Client: Logout response: $logoutResponse")
-        authCode = null
+        _authCode = null
     }
 
     override suspend fun getToken(authCode: String): CognitoIDToken {

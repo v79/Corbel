@@ -11,10 +11,14 @@ import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.http.ContentType
+import io.ktor.http.encodeURLPath
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.liamjd.cantilever.corbel.services.auth.AuthenticationService
-import java.net.URLEncoder
-import java.nio.charset.Charset
 
 class CantileverService(private val authService: AuthenticationService) {
 
@@ -27,16 +31,20 @@ class CantileverService(private val authService: AuthenticationService) {
     private val callbackUrl = "http://localhost:44817/callback"
 
     @Suppress("NewApi")
-    private val localCallbackUrl =
-        URLEncoder.encode(callbackUrl, Charset.defaultCharset())
+    private val localCallbackUrl = callbackUrl.encodeURLPath()
 
     private val client = HttpClient(CIO) {
+        engine {
+            requestTimeout =
+                30_000L // better to shorten this but start the ping as soon as the app starts? Ping doesn't require auth does it?
+        }
         install(Logging) {
-            logger = object : Logger {
-                override fun log(message: String) {
-//                    println("Ktor Client: $message")
+            logger =
+                object : Logger {
+                    override fun log(message: String) {
+                        println("Ktor Client: $message")
+                    }
                 }
-            }
         }
         install(ContentNegotiation) {
             json()
@@ -44,12 +52,28 @@ class CantileverService(private val authService: AuthenticationService) {
     }
 
     /**
+     * Make a call to pre-warm the API Lambda router function, returns nothing
+     */
+    @OptIn(DelicateCoroutinesApi::class)
+    fun warm() {
+        GlobalScope.launch {
+            val url = "https://api.cantilevers.org/warm"
+            client.get(url) {
+                accept(ContentType.Text.Plain)
+            }
+        }
+    }
+
+    /**
      * Get posts.json. Eventually, replace this with deserialized list of Post objects
      */
-    suspend fun getPostListJson(authCode: String): String {
+    suspend fun getPostListJson(): String {
         println("Getting post list json file")
         val url = "https://api.cantilevers.org/project/posts"
-        val token = authService.getToken(authCode)
+        val token = authService.getToken(authService.authCode)
+        println("Token: ${token.tokenType} ${token.createdTime} expiresIn: ${token.expiresIn}")
+
+        // default timeout might be too strict for these lambdas
 
         val response = client.get(url) {
             headers {
@@ -60,7 +84,7 @@ class CantileverService(private val authService: AuthenticationService) {
 
         println("Post list json:")
         println(response.body<String>())
-        return "{}"
+        return response.body<String>()
     }
 
 
