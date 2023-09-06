@@ -23,10 +23,11 @@ fun TabBar(colorScheme: ColorScheme, onTabChange: (Int) -> Unit) {
     Column(Modifier.fillMaxWidth()) {
         TabRow(selectedTabIndex = tabIndex) {
             Tabs.entries.forEachIndexed { index, title ->
+
                 Tab(
                     selected = tabIndex == index,
                     onClick = { tabIndex = index; onTabChange(tabIndex) }) {
-                    Text(title.name, color = colorScheme.onSurface, fontSize = 1.em)
+                    Text(title.label, color = colorScheme.onSurface, fontSize = 1.em)
                 }
             }
         }

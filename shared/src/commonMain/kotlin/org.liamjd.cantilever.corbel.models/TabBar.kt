@@ -1,8 +1,9 @@
 package org.liamjd.cantilever.corbel.models
 
-enum class Tabs {
-    POSTS,
-    PAGES,
-    TEMPLATES
+enum class Tabs(val label: String) {
+    POSTS("Posts"),
+    PAGES("Pages"),
+    TEMPLATES("Templates"),
+    MEDIA("Media")
 }
 
