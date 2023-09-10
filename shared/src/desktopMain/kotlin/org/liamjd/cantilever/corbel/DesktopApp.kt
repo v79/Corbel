@@ -21,8 +21,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.liamjd.cantilever.corbel.models.Tabs
@@ -84,7 +82,7 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
 
                             Mode.VIEWING -> {
                                 Column(Modifier.fillMaxWidth()) {
-                                    Row(
+                                   /* Row(
                                         Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.End
                                     ) {
@@ -93,9 +91,9 @@ fun DesktopApp(isDark: Boolean = true, window: ComposeWindow) {
                                         }) {
                                             Text("Logout")
                                         }
-                                    }
+                                    }*/
                                     Row(Modifier.fillMaxWidth()) {
-                                        TabBar(colorScheme = colorScheme, onTabChange = {
+                                        PrimaryNavigation(colorScheme = colorScheme, onTabChange = {
                                             when (it) {
                                                 0 -> currentTab.value = Tabs.POSTS
                                                 1 -> currentTab.value = Tabs.PAGES
